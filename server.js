@@ -23,10 +23,12 @@ io.on('connection', function(socket){
 });
 
 io.on('connection', function(socket){
-  socket.on('chat message', function(msg){
+  socket.on('chat message', function(message){
     //say it on irc
-    ircclient.say('#irchacks', msg); 
-    console.log('message: ' + msg);
+    ircclient.say('#irchacks', message);
+    // broadcast it back
+    io.emit('chat message', 'You:' + message);
+    console.log('message: ' + message);
   });
 });
 
@@ -38,6 +40,8 @@ var ircclient = new irc.Client('mujo.be.krey.net', 'ircporxy', {
 });
 
 ircclient.addListener('message', function (from, to, message) {
+    // send it to the socket
+    io.emit('chat message', from + ' => ' + to + ': ' + message);
     console.log(from + ' => ' + to + ': ' + message);
 });
 
