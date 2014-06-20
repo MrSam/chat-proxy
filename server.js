@@ -12,21 +12,39 @@ http.listen(3000, function(){
 });
 
 
+// Socket.io fun
+var io = require('socket.io')(http);
+
+io.on('connection', function(socket){
+  console.log('a user connected');
+  socket.on('disconnect', function(){
+    console.log('user disconnected');
+  });
+});
+
+io.on('connection', function(socket){
+  socket.on('chat message', function(msg){
+    //say it on irc
+    ircclient.say('#irchacks', msg); 
+    console.log('message: ' + msg);
+  });
+});
+
 // IRC fun
 var irc = require("irc");
 
-var client = new irc.Client('mujo.be.krey.net', 'ircporxy', {
+var ircclient = new irc.Client('mujo.be.krey.net', 'ircporxy', {
     channels: ['#irchacks'],
 });
 
-client.addListener('message', function (from, to, message) {
+ircclient.addListener('message', function (from, to, message) {
     console.log(from + ' => ' + to + ': ' + message);
 });
 
-client.addListener('pm', function (from, message) {
+ircclient.addListener('pm', function (from, message) {
     console.log(from + ' => ME: ' + message);
 });
 
-client.addListener('error', function(message) {
+ircclient.addListener('error', function(message) {
     console.log('error: ', message);
 });
