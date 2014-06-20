@@ -4,7 +4,8 @@
   "description": "Proxy server for IRC and stuff ",
   "main": "server.js",
   "dependencies": {
-    "irc": "~0.3.7"
+    "irc": "~0.3.7",
+    "express": "^4.4.3"
   },
   "devDependencies": {},
   "scripts": {
