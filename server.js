@@ -16,3 +16,7 @@ client.addListener('pm', function (from, message) {
 client.addListener('message#irchacks', function (from, message) {
     console.log(from + ' => #irchacks: ' + message);
 });
+
+client.addListener('error', function(message) {
+    console.log('error: ', message);
+});
