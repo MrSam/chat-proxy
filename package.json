@@ -1,0 +1,29 @@
+{
+  "name": "chat-proxy",
+  "version": "0.0.1",
+  "description": "Proxy server for IRC and stuff ",
+  "main": "server.js",
+  "dependencies": {
+    "irc": "~0.3.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MrSam/chat-proxy"
+  },
+  "keywords": [
+    "irc",
+    "proxy",
+    "chat",
+    "websocket"
+  ],
+  "author": "MrSam",
+  "license": "GNU",
+  "bugs": {
+    "url": "https://github.com/MrSam/chat-proxy/issues"
+  },
+  "homepage": "https://github.com/MrSam/chat-proxy"
+}
