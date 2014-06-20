@@ -1,30 +1,18 @@
-// Create the configuration
-var config = {
-	channels: ["#irchacks"],
-	server: "mujo.be.krey.net",
-	botName: "ircporxy"
-};
-
 // Get the lib
 var irc = require("irc");
 
-// Create the bot name
-var bot = new irc.Client(config.server, config.botName, {
-	channels: config.channels
+var client = new irc.Client('mujo.be.krey.net', 'ircporxy', {
+    channels: ['#irchacks'],
 });
 
-// Listen for joins
-bot.addListener("join", function(channel, who) {
-	// Welcome them in!
-	bot.say(channel, who + "...dude...welcome back!");
+client.addListener('message', function (from, to, message) {
+    console.log(from + ' => ' + to + ': ' + message);
 });
 
-// Listen for any message, PM said user when he posts
-bot.addListener("message", function(from, to, text, message) {
-	bot.say(from, "¿Que?");
+client.addListener('pm', function (from, message) {
+    console.log(from + ' => ME: ' + message);
 });
 
-// Listen for any message, say to him/her in the room
-bot.addListener("message", function(from, to, text, message) {
-	bot.say(config.channels[0], "¿Public que?");
+client.addListener('message#irchacks', function (from, message) {
+    console.log(from + ' => #irchacks: ' + message);
 });
