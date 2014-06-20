@@ -4,7 +4,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 
 app.get('/', function(req, res){
-  res.send('<h1>Hello world</h1>');
+  res.sendfile('html/index.html');
 });
 
 http.listen(3000, function(){
@@ -25,10 +25,6 @@ client.addListener('message', function (from, to, message) {
 
 client.addListener('pm', function (from, message) {
     console.log(from + ' => ME: ' + message);
-});
-
-client.addListener('message#irchacks', function (from, message) {
-    console.log(from + ' => #irchacks: ' + message);
 });
 
 client.addListener('error', function(message) {
