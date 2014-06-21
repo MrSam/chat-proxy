@@ -52,3 +52,7 @@ ircclient.addListener('pm', function (from, message) {
 ircclient.addListener('error', function(message) {
     console.log('error: ', message);
 });
+
+ircclient.addListener('names', function(channel,nicks) {
+    console.log( channel + ' list: '+ Object.keys(nicks));
+});
