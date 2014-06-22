@@ -17,6 +17,10 @@ var io = require('socket.io')(http);
 
 io.on('connection', function(socket){
   console.log('a user connected');
+  // send all important information like channels joined etc
+  // so the node-irc client keeps a list of .chans, but no member information
+  // so let's do this ourselves by keeping track of 'names' (on self join) and join,part and mode events
+  console.log('channels: ' + Object.keys(ircclient.chans));
   socket.on('disconnect', function(){
     console.log('user disconnected');
   });
