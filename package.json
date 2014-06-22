@@ -4,8 +4,8 @@
   "description": "Proxy server for IRC and stuff ",
   "main": "server.js",
   "dependencies": {
-    "express": "^4.4.3",
-    "socket.io": "^1.0.6",
+    "express": "",
+    "socket.io": "",
     "irc": "git://github.com/MrSam/node-irc"
   },
   "devDependencies": {},
