@@ -64,15 +64,11 @@
     </style>
   </head>
   <body>
- <ul id="tabs">
-  </ul>
-
-  <div id="content">
-  </div>
-    <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
+ <ul id="tabs"></ul>
+ <div id="content"></div>
+ <form action="">
+ <input id="m" autocomplete="off" /><button>Send</button>
+ </form>
 <script src="/socket.io/socket.io.js"></script>
 <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 <script>
@@ -101,7 +97,9 @@
   });
 
   socket.on('welcome', function(data) {
-	//TODO: on disconnect,reconnect we get the welcome but we already intitalised on our side so this means duplicate tabs etc
+        // reset!
+        $('#tabs').html("");
+        $('#content').html("");
 	my_nickname = data.my_nickname;
 	my_channels = data.my_channels;
 	var i=1;
