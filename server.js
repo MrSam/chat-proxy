@@ -31,6 +31,8 @@ io.on('connection', function(socket){
     // data:from,to,message
     //say it on irc
     ircclient.say(data.to, data.message);
+    // keep track of time
+    data.time_string = get_time();
     // broadcast it back
     io.emit('chat recieve', data);
     save_message(data);
@@ -52,13 +54,18 @@ io.on('connection', function(socket){
   });
 });
 
+function get_time() {
+  var currentdate = new Date();
+  return currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
+}
+
 
 // history
 var history = {};
 var counter = 0;
 function save_message(data) {
   // data:from,to,message
-  history[counter] = {to:data.to, from:data.from, message:data.message}; 
+  history[counter] = {to:data.to, from:data.from, message:data.message, time_string:data.time_string}; 
   counter++;
   console.log(history);
 }
@@ -84,7 +91,7 @@ var ircclient = new irc.Client('mujo.be.krey.net', 'ircporxy', {
 ircclient.addListener('message', function (from, to, message) {
     // send it to the socket
     io.emit('chat recieve', {from:from, to:to, message:message});
-    save_message({from:from, to:to, message:message});
+    save_message({from:from, to:to, message:message, time_string:get_time()});
     console.log(from + ' => ' + to + ': ' + message);
 });
 
