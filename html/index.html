@@ -11,15 +11,18 @@
       .messages { list-style-type: none; margin: 0; padding: 0; }
       .messages li { padding: 5px 10px; }
       .messages li:nth-child(odd) { background: #eee; }
-      .messages { float:left;}
-      .users { float:right; width:100px;display:block;}
-
+      .messages { float:left;width:calc(100% - 120px);}
+      .users { width:100px; list-style-type:none;padding:5px;position:fixed;right:0;top:20px;}
+      .users li { padding:5px 10px;}
+      .tab_content { display:block; overflow:auto;height:100%;padding-bottom:50px;padding-top:30px; }
       #tabs {
           overflow: hidden;
           width: 100%;
           margin: 0;
           padding: 0;
           list-style: none;
+	  top:0;
+          position:fixed;
         }
       
         #tabs li {
@@ -41,6 +44,7 @@
           border-bottom-color: #777\9;
           opacity: .3;
           filter: alpha(opacity=30);      
+	  z-index:999;
         }
       
         #tabs a:hover,
@@ -86,6 +90,7 @@
   socket.on('chat recieve', function(data){
 	var line = '<' + data.from + '> ' + data.message;
     	$('.messages.' + data.to.hashCode()).append($('<li>').text(line));
+ 	window.scrollTo(0,document.body.scrollHeight);
   });
 
   socket.on('refresh users', function(data) {
@@ -93,6 +98,14 @@
     Object.keys(data.users).forEach(function(name) {
        var line = data.users[name] + name;
        $('.users.' + data.channel.hashCode()).append($('<li>').text(line));
+    });
+  });
+
+  socket.on('history', function(data) {
+    Object.keys(data).forEach(function(key) {
+      var line = '<' + data[key].from + '> ' + data[key].message;
+      $('.messages.' + data[key].to.hashCode()).append($('<li>').text(line));
+      window.scrollTo(0,document.body.scrollHeight);
     });
   });
 
@@ -105,9 +118,10 @@
 	var i=1;
 	Object.keys(my_channels).forEach(function(key) {
 		$('#tabs').append("<li><a href='#' name='#tab"+ i +"'>"+ my_channels[key] +"</a></li>");
-		$('#content').append($('<div id="tab'+ i +'">'));
+		$('#content').append($('<div id="tab'+ i +'" class="tab_content">'));
 		$('#tab'+ i).append("<ul class='messages "+ my_channels[key].hashCode() +"' ></ul>");
 		$('#tab'+ i).append("<ul class='users "+ my_channels[key].hashCode() +"' ></ul>");
+		$('#tab'+ i).append("<div style='clear:both'></div>");
 		i++;
 	});
 	setupTabs();
@@ -123,7 +137,6 @@
 	}
 	return hash;
   }
-
 </script>
 <script>
 // tabs crap
@@ -143,7 +156,7 @@
         $("#tabs li:first a").attr("id","current"); // Activate first tab
 	active_tab = $("#tabs li:first a").html();
         socket.emit('refresh tab', active_tab);
-        $("#content > div:first").fadeIn(); // Show first tab content
+        $("#content > div:first").fadeIn(100); // Show first tab content
         
         $("#tabs a").on("click",function(e) {
             e.preventDefault();
@@ -154,7 +167,7 @@
 	    active_tab = $(this).html();
             resetTabs();
             $(this).attr("id","current"); // Activate this
-            $($(this).attr('name')).fadeIn(); // Show content for current tab
+            $($(this).attr('name')).fadeIn(100); // Show content for current tab
             }
         });
 
@@ -162,7 +175,7 @@
           if (myUrlTab == myUrlTabName + i) {
               resetTabs();
               $("a[name='"+myUrlTab+"']").attr("id","current"); // Activate url tab
-              $(myUrlTab).fadeIn(); // Show url tab content        
+              $(myUrlTab).fadeIn(100); // Show url tab content        
           }
         }
     };

@@ -33,6 +33,7 @@ io.on('connection', function(socket){
     ircclient.say(data.to, data.message);
     // broadcast it back
     io.emit('chat recieve', data);
+    save_message(data);
     console.log('message: ' + data.message);
   });
 
@@ -52,6 +53,16 @@ io.on('connection', function(socket){
 });
 
 
+// history
+var history = {};
+var counter = 0;
+function save_message(data) {
+  // data:from,to,message
+  history[counter] = {to:data.to, from:data.from, message:data.message}; 
+  counter++;
+  console.log(history);
+}
+
 // Webchat functions
 // (don't shoot me, i'm just adding everything in one file and split it 
 // up later)
@@ -60,6 +71,7 @@ function processConnect(nickname, channels) {
 	var my_channels = Object.keys(channels);
 	console.log('Hello im ' + my_nickname + ' and i joined channels ' + my_channels); 
 	io.emit('welcome', { my_nickname: my_nickname, my_channels:my_channels } );
+	io.emit('history', history); 
 }
 
 // IRC fun
@@ -72,6 +84,7 @@ var ircclient = new irc.Client('mujo.be.krey.net', 'ircporxy', {
 ircclient.addListener('message', function (from, to, message) {
     // send it to the socket
     io.emit('chat recieve', {from:from, to:to, message:message});
+    save_message({from:from, to:to, message:message});
     console.log(from + ' => ' + to + ': ' + message);
 });
 
