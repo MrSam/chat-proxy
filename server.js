@@ -32,9 +32,22 @@ io.on('connection', function(socket){
     //say it on irc
     ircclient.say(data.to, data.message);
     // broadcast it back
-  
     io.emit('chat recieve', data);
     console.log('message: ' + data.message);
+  });
+
+  socket.on('refresh tab', function(active_tab) {
+    console.log("refresh : " + active_tab);
+    // is this a channel?
+    var is_channel = false;
+    Object.keys(ircclient.chans).forEach(function(key) {
+      if(ircclient.chans[key].key === active_tab) {
+        io.emit('refresh users', {channel:ircclient.chans[key].key, users:ircclient.chans[key].users});
+        is_channel = true;
+      }
+    });
+
+    // TODO: if is_channel == false, it's a privmsg window
   });
 });
 
@@ -48,7 +61,6 @@ function processConnect(nickname, channels) {
 	console.log('Hello im ' + my_nickname + ' and i joined channels ' + my_channels); 
 	io.emit('welcome', { my_nickname: my_nickname, my_channels:my_channels } );
 }
-
 
 // IRC fun
 var irc = require("irc");

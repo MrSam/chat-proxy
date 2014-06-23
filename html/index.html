@@ -11,6 +11,8 @@
       .messages { list-style-type: none; margin: 0; padding: 0; }
       .messages li { padding: 5px 10px; }
       .messages li:nth-child(odd) { background: #eee; }
+      .messages { float:left;}
+      .users { float:right; width:100px;display:block;}
 
       #tabs {
           overflow: hidden;
@@ -84,10 +86,20 @@
     $('#m').val('');
     return false;
   });
+
   socket.on('chat recieve', function(data){
 	var line = '<' + data.from + '> ' + data.message;
-    	$('.' + data.to.hashCode()).append($('<li>').text(line));
+    	$('.messages.' + data.to.hashCode()).append($('<li>').text(line));
   });
+
+  socket.on('refresh users', function(data) {
+    $('.users.' + data.channel.hashCode()).html("");
+    Object.keys(data.users).forEach(function(name) {
+       var line = data.users[name] + name;
+       $('.users.' + data.channel.hashCode()).append($('<li>').text(line));
+    });
+  });
+
   socket.on('welcome', function(data) {
 	//TODO: on disconnect,reconnect we get the welcome but we already intitalised on our side so this means duplicate tabs etc
 	my_nickname = data.my_nickname;
@@ -97,6 +109,7 @@
 		$('#tabs').append("<li><a href='#' name='#tab"+ i +"'>"+ my_channels[key] +"</a></li>");
 		$('#content').append($('<div id="tab'+ i +'">'));
 		$('#tab'+ i).append("<ul class='messages "+ my_channels[key].hashCode() +"' ></ul>");
+		$('#tab'+ i).append("<ul class='users "+ my_channels[key].hashCode() +"' ></ul>");
 		i++;
 	});
 	setupTabs();
@@ -118,7 +131,9 @@
 // tabs crap
     function resetTabs(){
         $("#content > div").hide(); //Hide all content
-        $("#tabs a").attr("id",""); //Reset id's      
+        $("#tabs a").attr("id",""); //Reset id's
+	if(active_tab)
+	  socket.emit('refresh tab', active_tab);
     }
 
     var myUrl = window.location.href; //get URL
@@ -129,6 +144,7 @@
         $("#content > div").hide(); // Initially hide all content
         $("#tabs li:first a").attr("id","current"); // Activate first tab
 	active_tab = $("#tabs li:first a").html();
+        socket.emit('refresh tab', active_tab);
         $("#content > div:first").fadeIn(); // Show first tab content
         
         $("#tabs a").on("click",function(e) {
@@ -136,9 +152,9 @@
             if ($(this).attr("id") == "current"){ //detection for current tab
              return       
             }
-            else{             
-            resetTabs();
+            else{    
 	    active_tab = $(this).html();
+            resetTabs();
             $(this).attr("id","current"); // Activate this
             $($(this).attr('name')).fadeIn(); // Show content for current tab
             }
