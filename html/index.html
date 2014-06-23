@@ -88,7 +88,7 @@
   });
 
   socket.on('chat recieve', function(data){
-	var line = data.time_string + ' <' + data.from + '> ' + data.message;
+	var line = data.time_string + ' <' + data.nickname_prefix + data.from + '> ' + data.message;
     	$('.messages.' + data.to.hashCode()).append($('<li>').text(line));
  	window.scrollTo(0,document.body.scrollHeight);
   });
@@ -103,7 +103,7 @@
 
   socket.on('history', function(data) {
     Object.keys(data).forEach(function(key) {
-      var line = data[key].time_string + ' <' + data[key].from + '> ' + data[key].message;
+      var line = data[key].time_string + ' <' + data[key].nickname_prefix + data[key].from + '> ' + data[key].message;
       $('.messages.' + data[key].to.hashCode()).append($('<li>').text(line));
       window.scrollTo(0,document.body.scrollHeight);
     });

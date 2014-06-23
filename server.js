@@ -33,6 +33,14 @@ io.on('connection', function(socket){
     ircclient.say(data.to, data.message);
     // keep track of time
     data.time_string = get_time();
+    // add nickname_prefix
+    data.nickname_prefix = '';
+    Object.keys(ircclient.chans).forEach(function(key) {
+      if(ircclient.chans[key].key.toLowerCase() === data.to.toLowerCase()) {
+        data.nickname_prefix = ircclient.chans[key].users[data.from];
+      }
+    });
+
     // broadcast it back
     io.emit('chat recieve', data);
     save_message(data);
@@ -44,7 +52,7 @@ io.on('connection', function(socket){
     // is this a channel?
     var is_channel = false;
     Object.keys(ircclient.chans).forEach(function(key) {
-      if(ircclient.chans[key].key === active_tab) {
+      if(ircclient.chans[key].key.toLowerCase() === active_tab.toLowerCase()) {
         io.emit('refresh users', {channel:ircclient.chans[key].key, users:ircclient.chans[key].users});
         is_channel = true;
       }
@@ -65,9 +73,8 @@ var history = {};
 var counter = 0;
 function save_message(data) {
   // data:from,to,message
-  history[counter] = {to:data.to, from:data.from, message:data.message, time_string:data.time_string}; 
+  history[counter] = data; 
   counter++;
-  console.log(history);
 }
 
 // Webchat functions
@@ -90,8 +97,16 @@ var ircclient = new irc.Client('mujo.be.krey.net', 'ircporxy', {
 
 ircclient.addListener('message', function (from, to, message) {
     // send it to the socket
-    io.emit('chat recieve', {from:from, to:to, message:message});
-    save_message({from:from, to:to, message:message, time_string:get_time()});
+    // if to is a channel, then from is a member, so we need to add channel status to nickname
+    var nickname_prefix = '';
+    Object.keys(ircclient.chans).forEach(function(key) {
+      if(ircclient.chans[key].key.toLowerCase() === to.toLowerCase()) {
+        nickname_prefix = ircclient.chans[key].users[from];
+      }
+    });
+
+    io.emit('chat recieve', {from:from, to:to, message:message, nickname_prefix:nickname_prefix, time_string:get_time()});
+    save_message({from:from, to:to, message:message, nickname_prefix:nickname_prefix, time_string:get_time()});
     console.log(from + ' => ' + to + ': ' + message);
 });
 
