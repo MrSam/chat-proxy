@@ -89,6 +89,7 @@
     	$('.' + data.to.hashCode()).append($('<li>').text(line));
   });
   socket.on('welcome', function(data) {
+	//TODO: on disconnect,reconnect we get the welcome but we already intitalised on our side so this means duplicate tabs etc
 	my_nickname = data.my_nickname;
 	my_channels = data.my_channels;
 	var i=1;
