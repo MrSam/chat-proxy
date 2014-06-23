@@ -168,6 +168,7 @@
             resetTabs();
             $(this).attr("id","current"); // Activate this
             $($(this).attr('name')).fadeIn(100); // Show content for current tab
+	    window.scrollTo(0,document.body.scrollHeight);
             }
         });
 
