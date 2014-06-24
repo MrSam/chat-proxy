@@ -75,7 +75,6 @@
  </form>
 <script src="/socket.io/socket.io.js"></script>
 <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-<script src="jquery.tinysort.min.js"></script>
 <script>
   var socket = io();
   var my_nickname = false;
@@ -101,11 +100,7 @@
        $('.users.' + data.channel.hashCode()).append($('<li>').text(line));
     });
 
-    $("ul.users."+ data.channel.hashCode() +">li" ).tsort({
-      charOrder: '@abcdefgi+',
-      order: 'asc',
-      cases: 'false',
-    });
+    $("ul.users."+ data.channel.hashCode() +">li" ).sortElements(custom_sorter);
 
   });
 
@@ -189,6 +184,78 @@
           }
         }
     };
-</script>
+
+
+   // sorting of nicklist
+   var custom_sorter = custom_comparator('@+abcdefghijklmnopqrstuvwxyz01234567890_');
+
+   function custom_comparator(alphabet)
+   {
+       return function(a, b) {
+	   a = $(a).text();
+	   b = $(b).text();
+           var index_a = alphabet.indexOf(a[0]),
+           index_b = alphabet.indexOf(b[0]);
+   
+           if (index_a === index_b) {
+               // same first character, sort regular
+               if (a < b) {
+                   return -1;
+               } else if (a > b) {
+                   return 1;
+               }
+               return 0;
+           } else {
+               return index_a - index_b;
+           }
+       }
+   }
+
+/*
+  Found this here: http://james.padolsey.com/javascript/sorting-elements-with-jquery/
+*/
+jQuery.fn.sortElements = (function(){
+ 
+    var sort = [].sort;
+ 
+    return function(comparator, getSortable) {
+ 
+        getSortable = getSortable || function(){return this;};
+ 
+        var placements = this.map(function(){
+ 
+            var sortElement = getSortable.call(this),
+                parentNode = sortElement.parentNode,
+ 
+                nextSibling = parentNode.insertBefore(
+                    document.createTextNode(''),
+                    sortElement.nextSibling
+                );
+ 
+            return function() {
+ 
+                if (parentNode === this) {
+                    throw new Error(
+                        "You can't sort elements if any one is a descendant of another."
+                    );
+                }
+ 
+                // Insert before flag:
+                parentNode.insertBefore(this, nextSibling);
+                // Remove flag:
+                parentNode.removeChild(nextSibling);
+ 
+            };
+ 
+        });
+ 
+        return sort.call(this, comparator).each(function(i){
+            placements[i].call(getSortable.call(this));
+        });
+ 
+    };
+ 
+})();
+   </script>
   </body>
 </html>
