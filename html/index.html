@@ -81,6 +81,8 @@
   var my_channels = false;
   var active_tab = false;
 
+  $('form input').focus();
+
   $('form').submit(function(){
     socket.emit('chat send', {from:my_nickname, to:active_tab, message:$('#m').val()});
     $('#m').val('');
@@ -91,6 +93,7 @@
 	var line = data.time_string + ' <' + data.nickname_prefix + data.from + '> ' + data.message;
     	$('.messages.' + data.to.hashCode()).append($('<li>').text(line));
  	window.scrollTo(0,document.body.scrollHeight);
+        $('form input').focus();
   });
 
   socket.on('refresh users', function(data) {
@@ -173,6 +176,7 @@
             $(this).attr("id","current"); // Activate this
             $($(this).attr('name')).fadeIn(100); // Show content for current tab
 	    window.scrollTo(0,document.body.scrollHeight);
+	    $('form input').focus();
             }
         });
 
