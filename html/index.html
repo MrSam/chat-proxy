@@ -75,6 +75,7 @@
  </form>
 <script src="/socket.io/socket.io.js"></script>
 <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script src="jquery.tinysort.min.js"></script>
 <script>
   var socket = io();
   var my_nickname = false;
@@ -99,6 +100,13 @@
        var line = data.users[name] + name;
        $('.users.' + data.channel.hashCode()).append($('<li>').text(line));
     });
+
+    $("ul.users."+ data.channel.hashCode() +">li" ).tsort({
+      charOrder: '@abcdefgi+',
+      order: 'asc',
+      cases: 'false',
+    });
+
   });
 
   socket.on('history', function(data) {

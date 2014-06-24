@@ -7,6 +7,10 @@ app.get('/', function(req, res){
   res.sendfile('html/index.html');
 });
 
+app.get('/jquery.tinysort.min.js', function(req, res){
+  res.sendfile('html/jquery.tinysort.min.js');
+});
+
 http.listen(3000, function(){
   console.log('listening on *:3000');
 });
