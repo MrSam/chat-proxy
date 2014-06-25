@@ -8,6 +8,7 @@
       form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
       form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
       form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      .colored-link {color:#0000A0; }
       .messages { list-style-type: none; margin: 0; padding: 0; }
       .messages li { padding: 5px 10px; }
       .messages li:nth-child(odd) { background: #eee; }
@@ -91,7 +92,7 @@
 
   socket.on('chat recieve', function(data){
 	var line = data.time_string + ' <' + data.nickname_prefix + data.from + '> ' + data.message;
-    	$('.messages.' + data.to.hashCode()).append($('<li>').text(line));
+    	$('.messages.' + data.to.hashCode()).append(convertToLinks($('<li>').text(line)));
  	window.scrollTo(0,document.body.scrollHeight);
         $('form input').focus();
   });
@@ -110,7 +111,7 @@
   socket.on('history', function(data) {
     Object.keys(data).forEach(function(key) {
       var line = data[key].time_string + ' <' + data[key].nickname_prefix + data[key].from + '> ' + data[key].message;
-      $('.messages.' + data[key].to.hashCode()).append($('<li>').text(line));
+      $('.messages.' + data[key].to.hashCode()).append(convertToLinks($('<li>').text(line)));
       window.scrollTo(0,document.body.scrollHeight);
     });
   });
@@ -215,9 +216,19 @@
        }
    }
 
-/*
-  Found this here: http://james.padolsey.com/javascript/sorting-elements-with-jquery/
-*/
+  // TODO: Lame url replacer, regex is not the way to go here
+   function convertToLinks(li) {
+     var text = li.text();
+     var replaceText, replacePattern1;
+      
+     replacePattern1 = /(\b(https?):\/\/[-A-Z0-9+&amp;@#\/%?=~_|!:,.;]*[-A-Z0-9+&amp;@#\/%=~_|])/ig;
+     replacedText = text.replace(replacePattern1, '<a class="colored-link" title="$1" href="$1" target="_blank">$1</a>');
+     replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+     replacedText = replacedText.replace(replacePattern2, '$1<a class="colored-link" href="http://$2" target="_blank">$2</a>');
+     return "<li>" + replacedText + "</li>";
+  }  
+
+//Found this here: http://james.padolsey.com/javascript/sorting-elements-with-jquery/
 jQuery.fn.sortElements = (function(){
  
     var sort = [].sort;
