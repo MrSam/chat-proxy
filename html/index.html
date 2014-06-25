@@ -85,6 +85,9 @@
   $('form input').focus();
 
   $('form').submit(function(){
+    if($('#m').val() == '')
+      return false;
+
     socket.emit('chat send', {from:my_nickname, to:active_tab, message:$('#m').val()});
     $('#m').val('');
     return false;
