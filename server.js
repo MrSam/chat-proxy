@@ -78,6 +78,7 @@ var counter = 0;
 function save_message(data) {
   // data:from,to,message
   history[counter] = data; 
+  console.log(history);
   counter++;
 }
 
@@ -118,6 +119,6 @@ ircclient.addListener('pm', function (from, message) {
     console.log(from + ' => ME: ' + message);
 });
 
-ircclient.addListener('error', function(message) {
-    console.log('error: ', message);
+ircclient.addListener('raw', function(message) {
+    console.log('<< ', message);
 });
