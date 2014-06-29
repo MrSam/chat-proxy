@@ -33,6 +33,15 @@ io.on('connection', function(socket){
 io.on('connection', function(socket){
   socket.on('chat send', function(data){
     // data:from,to,message
+    if(data.message.charAt(0) == "/") {
+        var raw = data.message.substring(1, data.message.length);
+        var split = raw.split(" ");
+	var command = split.shift();
+	var command_message = split.join(" ");
+	console.log("command recieved: " + command);
+        ircclient.emit("webcommand." + command, command_message);
+       return;
+    }
     //say it on irc
     ircclient.say(data.to, data.message);
     // keep track of time
