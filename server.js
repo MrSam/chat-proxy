@@ -102,6 +102,12 @@ function processConnect(nickname, channels) {
 	io.emit('history', history); 
 }
 
+function refreshNicklist() {
+  Object.keys(ircclient.chans).forEach(function(key) {
+    io.emit('refresh users', {channel:ircclient.chans[key].key, users:ircclient.chans[key].users});
+  });
+}
+
 // IRC fun
 var irc = require("irc");
 
@@ -145,15 +151,30 @@ ircclient.addListener('nick', function(old_nick, new_nick, channels, message) {
 	//console.log(channels);
 	Object.keys(channels).forEach(function (key) {
 	  // send message
-	  io.emit('chat recieve', {from:"-", to:channels[key], message:old_nick + " is now known as " + new_nick, nickname_prefix:"-", time_string:get_time()});
-	  save_message({from:"-", to:channels[key], message:old_nick + " is now known as " + new_nick, nickname_prefix:"-", time_string:get_time()});
+          var message = old_nick + " is now known as " + new_nick;
+	  io.emit('chat recieve', {from:"-", to:channels[key], message:message, nickname_prefix:"-", time_string:get_time()});
+	  save_message({from:"-", to:channels[key], message:message, nickname_prefix:"-", time_string:get_time()});
 	}); 
 
         // this is so the webside can figure out if his own nick changes
 	io.emit('nickchange', {old_nick:old_nick, new_nick:new_nick});
 
         // and force a nicklist refresh 
-	Object.keys(ircclient.chans).forEach(function(key) {
-          io.emit('refresh users', {channel:ircclient.chans[key].key, users:ircclient.chans[key].users});
-	});
+	refreshNicklist();
 });
+
+/* Joining channels */
+// this is coming from thw web client
+
+//this is coming from the irc server
+// self.emit('join', message.args[0], message.nick, message);
+ircclient.addListener('join', function(channel, nickname, message) {
+	// print this on the screen 
+	var message = nickname + " joined " + channel;
+	io.emit('chat recieve', {from:"-", to:channel, message:message, nickname_prefix:"-", time_string:get_time()});
+	save_message({from:"-", to:channel, message:message, nickname_prefix:"-", time_string:get_time()});
+
+        //force nicklist refresh
+	refreshNicklist();
+});
+
