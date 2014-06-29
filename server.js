@@ -178,3 +178,20 @@ ircclient.addListener('join', function(channel, nickname, message) {
 	refreshNicklist();
 });
 
+/* Leaving channels */
+// this is coming from thw web client
+
+//this is coming from the irc server
+ircclient.addListener('part', function(channel, nickname, reason, message) {
+        // print this on the screen
+	if(reason) {
+          var message = nickname + " left " + channel + " (" + reason + ")";
+	} else {
+          var message = nickname + " left " + channel;
+        }
+        io.emit('chat recieve', {from:"-", to:channel, message:message, nickname_prefix:"-", time_string:get_time()});
+        save_message({from:"-", to:channel, message:message, nickname_prefix:"-", time_string:get_time()});
+
+        //force nicklist refresh
+        refreshNicklist();
+});
