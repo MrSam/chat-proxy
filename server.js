@@ -106,7 +106,7 @@ function processConnect(nickname, channels) {
 var irc = require("irc");
 
 var ircclient = new irc.Client('mujo.be.krey.net', 'ircporxy', {
-    channels: ['#irchacks', '#irchacks2', '#irchacks2'],
+    channels: ['#irchacks', '#irchacks2', '#irchacks3'],
 });
 
 ircclient.addListener('message', function (from, to, message) {
@@ -130,4 +130,30 @@ ircclient.addListener('pm', function (from, message) {
 
 ircclient.addListener('raw', function(message) {
     console.log('<< ', message);
+});
+
+/* Changing nicks! */
+// so this is coming from the web client
+ircclient.addListener('webcommand.nick', function(message) {
+    ircclient.changenick(message);
+});
+
+// and this is coming from the irc server
+// self.emit('nick', message.nick, message.args[0], channels, message);
+ircclient.addListener('nick', function(old_nick, new_nick, channels, message) {
+	// we need to print this on the screen for each of the channels
+	//console.log(channels);
+	Object.keys(channels).forEach(function (key) {
+	  // send message
+	  io.emit('chat recieve', {from:"-", to:channels[key], message:old_nick + " is now known as " + new_nick, nickname_prefix:"-", time_string:get_time()});
+	  save_message({from:"-", to:channels[key], message:old_nick + " is now known as " + new_nick, nickname_prefix:"-", time_string:get_time()});
+	}); 
+
+        // this is so the webside can figure out if his own nick changes
+	io.emit('nickchange', {old_nick:old_nick, new_nick:new_nick});
+
+        // and force a nicklist refresh 
+	Object.keys(ircclient.chans).forEach(function(key) {
+          io.emit('refresh users', {channel:ircclient.chans[key].key, users:ircclient.chans[key].users});
+	});
 });

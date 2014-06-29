@@ -13,6 +13,7 @@
       .messages li { padding: 5px 10px; }
       .messages li:nth-child(odd) { background: #eee; }
       .messages { float:left;width:calc(100% - 120px);}
+      li.server { color:#09c600;}
       .users { width:100px; list-style-type:none;padding:5px;position:fixed;right:0;top:20px;}
       .users li { padding:5px 10px;}
       .tab_content { display:block; overflow:auto;height:100%;padding-bottom:50px;padding-top:30px; }
@@ -94,10 +95,21 @@
   });
 
   socket.on('chat recieve', function(data){
-	var line = data.time_string + ' <' + data.nickname_prefix + data.from + '> ' + data.message;
-    	$('.messages.' + data.to.hashCode()).append($('<li>').text(line));
- 	window.scrollTo(0,document.body.scrollHeight);
-        $('form input').focus();
+    if(data.from == "-") {
+      var line = '*** ' + data.message + ' ***';
+      $('.messages.' + data.to.hashCode()).append($('<li class="server">').text(line));
+    } else {
+      var line = data.time_string + ' <' + data.nickname_prefix + data.from + '> ' + data.message;
+      $('.messages.' + data.to.hashCode()).append($('<li>').text(line));
+    }
+
+    window.scrollTo(0,document.body.scrollHeight);
+    $('form input').focus();
+  });
+
+  socket.on('nickchange', function(data) { 
+    if(data.old_nick == my_nickname)
+      my_nickname = data.new_nick;
   });
 
   socket.on('refresh users', function(data) {
@@ -113,8 +125,13 @@
 
   socket.on('history', function(data) {
     Object.keys(data).forEach(function(key) {
-      var line = data[key].time_string + ' <' + data[key].nickname_prefix + data[key].from + '> ' + data[key].message;
-      $('.messages.' + data[key].to.hashCode()).append($('<li>').text(line));
+      if(data[key].from == "-") {
+        var line = '*** ' + data[key].message + ' ***';
+        $('.messages.' + data[key].to.hashCode()).append($('<li class="server">').text(line));
+      } else {
+        var line = data[key].time_string + ' <' + data[key].nickname_prefix + data[key].from + '> ' + data[key].message;
+        $('.messages.' + data[key].to.hashCode()).append($('<li>').text(line));
+      }
       window.scrollTo(0,document.body.scrollHeight);
     });
   });
