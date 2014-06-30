@@ -195,3 +195,22 @@ ircclient.addListener('part', function(channel, nickname, reason, message) {
         //force nicklist refresh
         refreshNicklist();
 });
+
+/* Channel kicks */
+// this is coming from the web client
+
+//this is coming from the irc server
+// TODO: what if it's me thats being kicked ? handle this properly in webinterface
+ircclient.addListener('kick', function(channel, nickname, by_nickname, reason, message) {
+        // print this on the screen
+        if(reason) {
+          var message = nickname + " kicked by " + by_nickname + " (" + reason + ")";
+        } else {
+          var message = nickname + " kicked by " + by_nickname;
+        }
+        io.emit('chat recieve', {from:"-", to:channel, message:message, nickname_prefix:"-", time_string:get_time()});
+        save_message({from:"-", to:channel, message:message, nickname_prefix:"-", time_string:get_time()});
+
+        //force nicklist refresh
+        refreshNicklist();
+});
