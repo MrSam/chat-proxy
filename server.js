@@ -213,3 +213,24 @@ ircclient.addListener('kick', function(channel, nickname, by_nickname, reason, m
         //force nicklist refresh
         refreshNicklist();
 });
+
+/* Quit event */
+// this is coming from the web client
+
+//this is coming from the irc server
+ircclient.addListener('quit', function(nickname, reason, channels, message) {
+        // print this on the screen
+        if(reason) {
+          var message = nickname + " has quit " + " (" + reason + ")";
+        } else {
+          var message = nickname + " has quit";
+        }
+        Object.keys(channels).forEach(function (key) {
+          // send message
+          io.emit('chat recieve', {from:"-", to:channels[key], message:message, nickname_prefix:"-", time_string:get_time()});
+          save_message({from:"-", to:channels[key], message:message, nickname_prefix:"-", time_string:get_time()});
+        });
+
+        //force nicklist refresh
+        refreshNicklist();
+});
