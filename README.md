@@ -14,7 +14,11 @@ Just like i'm able to detach and attach my screen session containing irssi, i
 should be able to disconnect my browser session, and when reconnecting i should get
 all channel and privatemsg history.
 
-
 #Additional challenge
 Instead of going all crazy on this for a few nights i want to achieve a 100 days in a row
 git commit streak on github.
+
+#How to install?
+git clone https://github.com/MrSam/chat-proxy
+npm install
+node server.js
